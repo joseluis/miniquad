@@ -178,7 +178,8 @@ impl WindowsDisplay {
                 );
             } else {
                 let (w, h) = {
-                    let d = crate::native_display().lock().unwrap();
+                    let display = crate::native_display();
+                    let d = display.lock().unwrap();
                     (d.screen_width, d.screen_height)
                 };
 
@@ -287,7 +288,8 @@ unsafe extern "system" fn win32_wndproc(
 
     match umsg {
         WM_CLOSE => {
-            let mut d = crate::native_display().lock().unwrap();
+            let display = crate::native_display();
+            let mut d = display.lock().unwrap();
             // only give user a chance to intervene when sapp_quit() wasn't already called
             if !d.quit_ordered {
                 // if window should be closed and event handling is enabled, give user code
@@ -434,7 +436,8 @@ unsafe extern "system" fn win32_wndproc(
             // convert from normalised absolute coordinates
             if (data.data.mouse().usFlags & MOUSE_MOVE_ABSOLUTE) == MOUSE_MOVE_ABSOLUTE {
                 let (width, height) = {
-                    let d = crate::native_display().lock().unwrap();
+                    let display = crate::native_display();
+                    let d = display.lock().unwrap();
                     (d.screen_width as f32, d.screen_height as f32)
                 };
 
@@ -499,7 +502,8 @@ unsafe extern "system" fn win32_wndproc(
                 SwapBuffers(payload.dc);
 
                 if payload.update_dimensions(hwnd) {
-                    let d = crate::native_display().lock().unwrap();
+                    let display = crate::native_display();
+                    let d = display.lock().unwrap();
                     let width = d.screen_width as f32;
                     let height = d.screen_height as f32;
                     drop(d);
@@ -519,7 +523,8 @@ unsafe extern "system" fn win32_wndproc(
             let mut path: [u16; MAX_PATH] = std::mem::uninitialized();
             let num_drops = DragQueryFileW(hdrop, u32::MAX, std::ptr::null_mut(), 0);
 
-            let mut d = crate::native_display().lock().unwrap();
+            let display = crate::native_display();
+            let mut d = display.lock().unwrap();
             for i in 0..num_drops {
                 let path_len =
                     DragQueryFileW(hdrop, i, path.as_mut_ptr(), MAX_PATH as u32) as usize;
@@ -773,7 +778,8 @@ impl WindowsDisplay {
     /// and window position from the window's rect.
     /// returns true if size or position has changed
     unsafe fn update_dimensions(&mut self, hwnd: HWND) -> bool {
-        let mut d = crate::native_display().lock().unwrap();
+        let display = crate::native_display();
+        let mut d = display.lock().unwrap();
         let mut rect: RECT = std::mem::zeroed();
 
         // Get the outer rectangle of the window in screen coordinates
@@ -975,7 +981,8 @@ where
             }
 
             if display.update_dimensions(wnd) {
-                let d = crate::native_display().lock().unwrap();
+                let display = crate::native_display();
+                let d = display.lock().unwrap();
                 let width = d.screen_width as f32;
                 let height = d.screen_height as f32;
                 drop(d);

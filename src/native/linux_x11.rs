@@ -135,7 +135,8 @@ impl X11Display {
                 event_handler.window_minimized_event();
             }
             22 => {
-                let mut d = crate::native_display().try_lock().unwrap();
+                let display = crate::native_display();
+                let mut d = display.try_lock().unwrap();
                 let left = (*event).xconfigure.x;
                 let top = (*event).xconfigure.y;
                 d.screen_position = (left as _, top as _);
@@ -151,7 +152,8 @@ impl X11Display {
                 }
             }
             33 => {
-                let mut d = crate::native_display().try_lock().unwrap();
+                let display = crate::native_display();
+                let mut d = display.try_lock().unwrap();
                 if (*event).xclient.message_type == self.libx11.extensions.wm_protocols {
                     let protocol = (*event).xclient.data.l[0 as libc::c_int as usize] as Atom;
                     if protocol == self.libx11.extensions.wm_delete_window {
@@ -180,11 +182,13 @@ impl X11Display {
             _ => {}
         };
 
-        let d = crate::native_display().try_lock().unwrap();
+        let display = crate::native_display();
+        let d = display.try_lock().unwrap();
         if d.quit_requested && !d.quit_ordered {
             drop(d);
             event_handler.quit_requested_event();
-            let mut d = crate::native_display().try_lock().unwrap();
+            let display = crate::native_display();
+            let mut d = display.try_lock().unwrap();
             if d.quit_requested {
                 d.quit_ordered = true
             }

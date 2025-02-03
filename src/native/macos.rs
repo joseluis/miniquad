@@ -135,7 +135,8 @@ impl MacosDisplay {
 
 impl MacosDisplay {
     fn transform_mouse_point(&self, point: &NSPoint) -> (f32, f32) {
-        let d = native_display().lock().unwrap();
+        let display = native_display();
+        let d = display.lock().unwrap();
         let new_x = point.x as f32 * d.dpi_scale;
         let new_y = d.screen_height as f32 - (point.y as f32 * d.dpi_scale) - 1.;
 
@@ -155,7 +156,8 @@ impl MacosDisplay {
     }
 
     unsafe fn update_dimensions(&mut self) -> Option<(i32, i32)> {
-        let mut d = native_display().lock().unwrap();
+        let display = native_display();
+        let mut d = display.lock().unwrap();
         unsafe {
             if self.gl_context != nil {
                 msg_send_![self.gl_context, update];
@@ -965,7 +967,8 @@ unsafe fn perform_redraw(
     }
 
     {
-        let d = native_display().lock().unwrap();
+        let display = native_display();
+        let d = display.lock().unwrap();
         if d.quit_requested || d.quit_ordered {
             drop(d);
             let () = msg_send![display.window, performClose: nil];
@@ -1092,7 +1095,8 @@ where
         AppleGfxApi::Metal => create_metal_view(&mut display, conf.sample_count, conf.high_dpi),
     };
     {
-        let mut d = native_display().lock().unwrap();
+        let display = native_display();
+        let mut d = display.lock().unwrap();
         d.view = view;
     }
     (*view).set_ivar("display_ptr", &mut display as *mut _ as *mut c_void);
@@ -1156,7 +1160,8 @@ where
         }
 
         {
-            let d = native_display().lock().unwrap();
+            let display = native_display();
+            let d = display.lock().unwrap();
             if d.quit_requested || d.quit_ordered {
                 done = true;
             }

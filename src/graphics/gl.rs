@@ -572,6 +572,11 @@ impl GlContext {
         &self.info.features
     }
 }
+impl Drop for GlContext {
+    fn drop(&mut self) {
+        crate::clear_display();
+    }
+}
 
 fn load_shader_internal(
     vertex_shader: &str,
@@ -1455,8 +1460,7 @@ impl RenderingBackend for GlContext {
                     TextureOrRenderbuffer::Renderbuffer(id) => id,
                 };
                 unsafe {
-                    self.cache
-                        .bind_texture(n, texture.params.kind.into(), raw);
+                    self.cache.bind_texture(n, texture.params.kind.into(), raw);
                     glUniform1i(gl_loc, n as i32);
                 }
             }
