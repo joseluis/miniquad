@@ -198,7 +198,8 @@ impl MainThreadState {
                 }
 
                 {
-                    let mut d = crate::native_display().lock().unwrap();
+                    let display = crate::native_display();
+                    let mut d = display.lock().unwrap();
                     d.screen_width = width as _;
                     d.screen_height = height as _;
                 }

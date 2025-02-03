@@ -336,7 +336,8 @@ pub fn define_glk_or_mtk_view_dlg(superclass: &Class) -> *const Class {
             || native_display().lock().unwrap().screen_height != screen_height
         {
             {
-                let mut d = native_display().lock().unwrap();
+                let display = native_display();
+                let mut d = display.lock().unwrap();
                 d.screen_width = screen_width;
                 d.screen_height = screen_height;
             }

@@ -155,7 +155,8 @@ impl MacosDisplay {
     }
 
     unsafe fn update_dimensions(&mut self) -> Option<(i32, i32)> {
-        let mut d = native_display().lock().unwrap();
+        let display = native_display();
+        let mut d = display.lock().unwrap();
         unsafe {
             if self.gl_context != nil {
                 msg_send_![self.gl_context, update];
@@ -1092,7 +1093,8 @@ where
         AppleGfxApi::Metal => create_metal_view(&mut display, conf.sample_count, conf.high_dpi),
     };
     {
-        let mut d = native_display().lock().unwrap();
+        let display = native_display();
+        let mut d = display.lock().unwrap();
         d.view = view;
     }
     (*view).set_ivar("display_ptr", &mut display as *mut _ as *mut c_void);
